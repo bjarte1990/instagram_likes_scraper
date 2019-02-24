@@ -8,7 +8,7 @@ import re
 import pandas as pd
 from bs4 import BeautifulSoup
 
-URL = 'https://www.instagram.com/p/BuO0mBuhWLe/'
+URL = 'https://www.instagram.com/p/your-post-comes-here/'
 base_url = 'https://www.instagram.com/'
 
 def get_profile_infos(profiles):
