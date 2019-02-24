@@ -20,13 +20,23 @@ def get_profile_infos(profiles):
             soup = BeautifulSoup(html.text, 'lxml')
             item = soup.select_one("meta[property='og:description']")
             name = item.find_previous_sibling().get("content").split("•")[0]
-            info = re.search('(.*) Followers, (.*) Following, (.*) Posts .*', item.get("content"))
-            (followers, following, posts)= info.groups()
+            info = re.search('(.*) Followers, (.*) Following, (.*) Posts .*', item.get('content'))
+            (followers, following, posts) = info.groups()
             name = name.split('(')[0].strip()
-
-            infos.append({'id': profile, 'name': name, 'followers': followers, 'following': following, 'posts': posts})
+            emails = re.search('\"business_email\":\"(.*?)\"', str(soup))
+            phones = re.search('\"business_phone_number\":\"(.*?)\"', str(soup))
+            if emails:
+                email = emails.group(1)
+            else:
+                email = ''
+            if phones:
+                phone = phones.group(1)
+            else:
+                phone = ''
+            infos.append({'id': profile, 'name': name, 'followers': followers, 'following': following, 'posts': posts,
+                          'email': email, 'phone': phone})
         except:
-            print("[ERROR] Parsing error for user: %s" % profile)
+            print('[ERROR] Parsing error for user: %s' % profile)
     return infos
 
 def get_liking_profiles(url):
@@ -54,9 +64,11 @@ def get_liking_profiles(url):
         profiles = profiles.union(set(map(lambda x: x.text.split('\n')[0], actual_profiles)))
 
 
-liking_profiles = get_liking_profiles(URL)
-profile_infos = get_profile_infos(liking_profiles)
+if __name__ == '__main__':
+
+    liking_profiles = get_liking_profiles(URL)
+    profile_infos = get_profile_infos(liking_profiles)
 
 
-df = pd.DataFrame(profile_infos)
-df.to_excel('profiles.xlsx', index=False)
+    df = pd.DataFrame(profile_infos)
+    df.to_excel('profiles.xlsx', index=False)
